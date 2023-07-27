@@ -10,14 +10,12 @@ module.exports = {
       { type: Sequelize.QueryTypes.SELECT }
     );
 
-    const usersIdArr = (
-      await queryInterface.sequelize.query(
-        `SELECT id FROM Users WHERE role = 'user';`,
-        {
-          type: Sequelize.QueryTypes.SELECT,
-        }
-      )
-    ).map((userObj) => userObj.id);
+    const usersIdArr = await queryInterface.sequelize.query(
+      `SELECT id FROM Users WHERE role = 'user';`,
+      {
+        type: Sequelize.QueryTypes.SELECT,
+      }
+    );
 
     const replies = [];
 
@@ -25,7 +23,8 @@ module.exports = {
       replies.push(
         ...Array.from({ length: repliesPerTweet }, () => {
           return {
-            UserId: usersIdArr[Math.floor(Math.random() * usersIdArr.length)],
+            UserId:
+              usersIdArr[Math.floor(Math.random() * usersIdArr.length)].id,
             TweetId: tweetObj.id,
             comment: faker.lorem.sentence(),
             createdAt: new Date(),
