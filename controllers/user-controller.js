@@ -1,7 +1,9 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { getUser } = require("../helpers/auth-helper");
 const { newError } = require("../helpers/error-helper");
 const { User } = require("../models");
+
 const userController = {
   signIn: (req, res, next) => {
     try {
@@ -47,6 +49,18 @@ const userController = {
       const newUser = user.toJSON();
       delete newUser.password;
       return res.json(newUser);
+    } catch (error) {
+      next(error);
+    }
+  },
+  getCurrentUser: async (req, res, next) => {
+    try {
+      const currentUser = await User.findByPk(getUser(req).id, {
+        attributes: { exclude: ["password"] },
+        raw: true,
+      });
+      if (!currentUser) throw newError(404, "使用者不存在");
+      return res.json(currentUser);
     } catch (error) {
       next(error);
     }
