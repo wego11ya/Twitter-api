@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { getUser } = require("../helpers/auth-helper");
 const { newError } = require("../helpers/error-helper");
-const { User } = require("../models");
+const { User, Tweet, Followship } = require("../models");
 
 const userController = {
   signIn: (req, res, next) => {
@@ -55,12 +55,46 @@ const userController = {
   },
   getCurrentUser: async (req, res, next) => {
     try {
+      console.log("test");
       const currentUser = await User.findByPk(getUser(req).id, {
         attributes: { exclude: ["password"] },
         raw: true,
       });
+
       if (!currentUser) throw newError(404, "使用者不存在");
       return res.json(currentUser);
+    } catch (error) {
+      next(error);
+    }
+  },
+  getUserInfo: async (req, res, next) => {
+    try {
+      // Retreive followerCount, followingCount,tweetsCount, isFollowed
+      const theUserId = req.params.id;
+      const theUser = await User.findByPk(theUserId, {
+        attributes: {
+          exclude: ["password", "createdAt", "updatedAt"],
+        },
+        raw: true,
+      });
+      if (!theUser || theUser.role !== "user")
+        throw newError(404, "使用者不存在");
+      const [followerCount, followingCount, tweetsCount, isFollowed] =
+        await Promise.all([
+          Followship.count({ where: { followingId: theUserId } }),
+          Followship.count({ where: { followerId: theUserId } }),
+          Tweet.count({ where: { UserId: theUserId } }),
+          Followship.findOne({
+            where: { followerId: getUser(req).id, followingId: theUserId },
+          }),
+        ]);
+      return res.json({
+        ...theUser,
+        followerCount,
+        followingCount,
+        tweetsCount,
+        isFollowed: !!isFollowed,
+      });
     } catch (error) {
       next(error);
     }
