@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { getUser } = require("../helpers/auth-helper");
 const { newError } = require("../helpers/error-helper");
-const { User, Tweet, Followship } = require("../models");
+const { User, Tweet, Followship, Like, Reply } = require("../models");
 
 const userController = {
   signIn: (req, res, next) => {
@@ -95,6 +95,48 @@ const userController = {
         tweetsCount,
         isFollowed: !!isFollowed,
       });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getUserTweets: async (req, res, next) => {
+    try {
+      // retreive likeCounts, replyCounts, isLiked
+      const theUserId = req.params.id;
+      const currentUserId = getUser(req).id;
+      const theUser = await User.findByPk(theUserId);
+      if (!theUser || theUser.role !== "user")
+        throw newError(404, "使用者不存在");
+      const tweets = await Tweet.findAll({
+        where: { UserId: theUserId },
+        include: [
+          { model: Like, attributes: ["id", "UserId"] },
+          { model: Reply, attributes: ["id"] },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+      if (tweets.length === 0) throw newError(404, "使用者沒有推文");
+      const tweetsInfo = tweets.map((tweet) => {
+        let isLiked = false;
+        let tweetJSON = tweet.toJSON();
+        for (let i = 0; i < tweetJSON.Likes.length; i++) {
+          if (tweetJSON.Likes[i].UserId === currentUserId) {
+            isLiked = true;
+            break;
+          }
+        }
+        return {
+          id: tweet.id,
+          UserId: tweet.UserId,
+          description: tweet.description,
+          createdAt: tweet.createdAt,
+          likeCounts: tweet.Likes.length,
+          replyCounts: tweet.Replies.length,
+          isLiked,
+        };
+      });
+
+      return res.json(tweetsInfo);
     } catch (error) {
       next(error);
     }
