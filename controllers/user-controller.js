@@ -175,6 +175,49 @@ const userController = {
       next(error);
     }
   },
+  getUserLikes: async (req, res, next) => {
+    // 推文資料, 每天推文的likeCounts, replyCounts, isLiked
+    try {
+      const theUserId = req.params.id;
+      const currentUserId = getUser(req).id;
+      const theUser = await User.findByPk(theUserId);
+      if (!theUser || theUser.role !== "user")
+        throw newError(404, "使用者不存在");
+      const likes = await Like.findAll({
+        where: { UserId: theUserId },
+        include: [
+          {
+            model: Tweet,
+            include: [
+              { model: Like },
+              { model: Reply },
+              { model: User, attributes: ["id", "account", "name", "avatar"] },
+            ],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+      const likesInfo = likes.map((like) => {
+        const likeJSON = like.toJSON();
+        const isLiked = likeJSON.Tweet.Likes.some(
+          (like) => like.UserId === currentUserId
+        );
+
+        return {
+          TweetId: likeJSON.Tweet.id,
+          user: likeJSON.Tweet.User,
+          description: likeJSON.Tweet.description,
+          likeCounts: likeJSON.Tweet.Likes.length,
+          replyCounts: likeJSON.Tweet.Replies.length,
+          isLiked,
+          createdAt: likeJSON.Tweet.createdAt,
+        };
+      });
+      res.json(likesInfo);
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 
 module.exports = userController;
