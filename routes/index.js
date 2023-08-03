@@ -5,7 +5,7 @@ const userController = require("../controllers/user-controller");
 const { authenticatedUser, authenticatedAdmin } = require("../middleware/auth");
 
 // 前台註冊
-router.post("/api/users/signUp", userController.signUp);
+router.post("/api/users", userController.signUp);
 // 前台登入
 router.post(
   "/api/users/signIn",
