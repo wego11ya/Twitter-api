@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const { getUser } = require("../helpers/auth-helper");
 const { newError } = require("../helpers/error-helper");
 const { User, Tweet, Followship, Like, Reply } = require("../models");
+const { de } = require("faker/lib/locales");
 
 const userController = {
   signIn: (req, res, next) => {
@@ -137,6 +138,39 @@ const userController = {
       });
 
       return res.json(tweetsInfo);
+    } catch (error) {
+      next(error);
+    }
+  },
+  getUserReplies: async (req, res, next) => {
+    try {
+      // retreive replies and replyTo(which user account)
+
+      const theUserId = req.params.id;
+      const theUser = await User.findByPk(theUserId);
+      if (!theUser || theUser.role !== "user")
+        throw newError(404, "使用者不存在");
+      const replies = await Reply.findAll({
+        where: { UserId: theUserId },
+        include: [
+          {
+            model: Tweet,
+            attributes: ["id"],
+            include: [{ model: User, attributes: ["account"] }],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+      const repliesInfo = replies.map((reply) => {
+        const replyJSON = reply.toJSON();
+        const replyTo = replyJSON.Tweet.User.account;
+        delete replyJSON.Tweet;
+        return {
+          ...replyJSON,
+          replyTo,
+        };
+      });
+      return res.json(repliesInfo);
     } catch (error) {
       next(error);
     }
