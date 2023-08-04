@@ -56,7 +56,6 @@ const userController = {
   },
   getCurrentUser: async (req, res, next) => {
     try {
-      console.log("test");
       const currentUser = await User.findByPk(getUser(req).id, {
         attributes: { exclude: ["password"] },
         raw: true,
@@ -118,14 +117,10 @@ const userController = {
       });
       if (tweets.length === 0) throw newError(404, "使用者沒有推文");
       const tweetsInfo = tweets.map((tweet) => {
-        let isLiked = false;
         let tweetJSON = tweet.toJSON();
-        for (let i = 0; i < tweetJSON.Likes.length; i++) {
-          if (tweetJSON.Likes[i].UserId === currentUserId) {
-            isLiked = true;
-            break;
-          }
-        }
+        const isLiked = tweetJSON.Likes.some(
+          (like) => like.UserId === currentUserId
+        );
         return {
           id: tweet.id,
           UserId: tweet.UserId,
