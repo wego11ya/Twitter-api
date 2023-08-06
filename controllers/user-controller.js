@@ -171,7 +171,7 @@ const userController = {
     }
   },
   getUserLikes: async (req, res, next) => {
-    // 推文資料, 每天推文的likeCounts, replyCounts, isLiked
+    // Tweets, likeCounts, replyCounts, isLiked
     try {
       const theUserId = req.params.id;
       const currentUserId = getUser(req).id;
@@ -209,6 +209,41 @@ const userController = {
         };
       });
       res.json(likesInfo);
+    } catch (error) {
+      next(error);
+    }
+  },
+  getUserFollowings: async (req, res, next) => {
+    try {
+      const currentUser = getUser(req);
+      const theUserId = Number(req.params.id);
+      const theUser = await User.findByPk(theUserId, {
+        include: [
+          {
+            model: User,
+            as: "Followings",
+            attributes: ["id", "name", "account", "avatar", "introduction"],
+          },
+        ],
+      });
+      if (!theUser || theUser.role !== "user")
+        throw newError(404, "使用者不存在");
+      const followingsByCurrentUser = await Followship.findAll({
+        where: { followerId: currentUser.id },
+        attributes: ["followingId"],
+      });
+      const followingsIds = followingsByCurrentUser.map((f) => f.followingId);
+      const userFollowings = theUser.Followings.map((following) => {
+        return {
+          followingId: following.id,
+          name: following.name,
+          account: following.account,
+          avarat: following.avatar,
+          introduction: following.introduction,
+          isFollowing: followingsIds.includes(following.id),
+        };
+      });
+      res.json(userFollowings);
     } catch (error) {
       next(error);
     }
