@@ -6,6 +6,7 @@ router.get("/:id/tweets", userController.getUserTweets);
 router.get("/:id/replied_tweeets", userController.getUserReplies);
 router.get("/:id/likes", userController.getUserLikes);
 router.get("/:id/followings", userController.getUserFollowings);
+router.get("/:id/followers", userController.getUserFollowers);
 router.get("/:id", userController.getUserInfo);
 
 module.exports = router;
