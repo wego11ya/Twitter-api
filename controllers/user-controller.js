@@ -2,8 +2,14 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { getUser } = require("../helpers/auth-helper");
 const { newError } = require("../helpers/error-helper");
-const { User, Tweet, Followship, Like, Reply } = require("../models");
-const { de } = require("faker/lib/locales");
+const {
+  User,
+  Tweet,
+  Followship,
+  Like,
+  Reply,
+  sequelize,
+} = require("../models");
 
 const userController = {
   signIn: (req, res, next) => {
@@ -279,6 +285,37 @@ const userController = {
         };
       });
       res.json(userFollowers);
+    } catch (error) {
+      next(error);
+    }
+  },
+  getTopFollowedUsers: async (req, res, next) => {
+    try {
+      const currentUser = getUser(req);
+      const limit = 10;
+      const users = await User.findAll({
+        attributes: [
+          "id",
+          "name",
+          "account",
+          "avatar",
+          [
+            sequelize.literal(
+              "(SELECT COUNT(*) FROM Followships WHERE followingId = user.id)"
+            ),
+            "followerCount",
+          ],
+          [
+            sequelize.literal(
+              `(SELECT EXISTS (SELECT id FROM Followships WHERE followerId = ${currentUser.id} AND followingId = user.id))`
+            ),
+            "isFollowed",
+          ],
+        ],
+        order: [[sequelize.literal("followerCount"), "DESC"]],
+        limit,
+      });
+      res.json(users);
     } catch (error) {
       next(error);
     }
