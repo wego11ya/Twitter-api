@@ -320,6 +320,36 @@ const userController = {
       next(error);
     }
   },
+  addFollowing: async (req, res, next) => {
+    try {
+      const id = Number(req.body.id);
+      const currentUser = getUser(req);
+      if (id === currentUser.id) throw newError(400, "無法追蹤自己");
+      const followship = await Followship.findOne({
+        where: { followerId: currentUser.id, followingId: id },
+      });
+      if (followship) throw newError(400, "已追蹤過該使用者!");
+      const newFollowship = await Followship.create({
+        followerId: currentUser.id,
+        followingId: id,
+      });
+      res.json(newFollowship);
+    } catch (error) {
+      next(error);
+    }
+  },
+  removeFollowing: async (req, res, next) => {
+    try {
+      const followingId = Number(req.params.followingId);
+      const currentUser = getUser(req);
+      const deletedFollowship = await Followship.destroy({
+        where: { followerId: currentUser.id, followingId },
+      });
+      res.json({ deleted: deletedFollowship > 0 });
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 
 module.exports = userController;

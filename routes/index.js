@@ -2,6 +2,7 @@ const router = require("express").Router();
 const passport = require("../config/passport");
 const user = require("./modules/user");
 const tweet = require("./modules/tweet");
+const followship = require("./modules/followship");
 const userController = require("../controllers/user-controller");
 const { authenticatedUser, authenticatedAdmin } = require("../middleware/auth");
 
@@ -17,5 +18,6 @@ router.post(
 router.use("/api/users", authenticatedUser, user);
 // tweet功能
 router.use("/api/tweets", authenticatedUser, tweet);
-
+// followship功能
+router.use("/api/followships", authenticatedUser, followship);
 module.exports = router;
