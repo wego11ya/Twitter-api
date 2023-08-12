@@ -29,6 +29,53 @@ const adminController = {
       next(error);
     }
   },
+  getUsers: async (req, res, next) => {
+    try {
+      /*
+      tweetsCount
+      likesCount (指使用者的 tweets 所獲得 like 的累積總量)
+      followerCount
+      followingCount
+      使用者清單預設按推文數排序，由多至少
+      */
+      const users = await User.findAll({
+        where: { role: "user" },
+        attributes: {
+          exclude: ["password"],
+          include: [
+            [
+              sequelize.literal(
+                `(SELECT COUNT(id) FROM Tweets WHERE UserId = User.id)`
+              ),
+              "tweetsCount",
+            ],
+            [
+              sequelize.literal(
+                `(SELECT COUNT(id) FROM Likes WHERE TweetId IN (SELECT id FROM Tweets WHERE UserId = User.id))`
+              ),
+              "likesCount",
+            ],
+            [
+              sequelize.literal(`(
+                SELECT COUNT(id) FROM Followships WHERE followingId = User.id
+              )`),
+              "followerCount",
+            ],
+            [
+              sequelize.literal(`(
+                SELECT COUNT(id) FROM Followships WHERE followerId = User.id
+              )`),
+              "followingCount",
+            ],
+          ],
+        },
+        order: [[sequelize.literal("tweetsCount"), "DESC"]],
+      });
+      res.json(users);
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 
 module.exports = adminController;

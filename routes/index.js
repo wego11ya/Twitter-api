@@ -22,6 +22,8 @@ router.post(
   passport.authenticate("local", { session: false }),
   adminController.signIn
 );
+// admin功能
+router.use("/api/admin", authenticatedAdmin, admin);
 // user功能
 router.use("/api/users", authenticatedUser, user);
 // tweet功能
