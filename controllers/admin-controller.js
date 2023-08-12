@@ -76,6 +76,36 @@ const adminController = {
       next(error);
     }
   },
+  getTweets: async (req, res, next) => {
+    try {
+      const tweets = await Tweet.findAll({
+        include: [
+          { model: User, attributes: ["id", "name", "account", "avatar"] },
+        ],
+        attributes: [
+          "id",
+          "description",
+          "createdAt",
+          [
+            sequelize.literal(`(
+            SELECT COUNT(id) FROM Replies WHERE TweetId = Tweet.id
+          )`),
+            "repliesCount",
+          ],
+          [
+            sequelize.literal(`(
+            SELECT COUNT(id) FROM Likes WHERE TweetId = Tweet.id
+          )`),
+            "likesCount",
+          ],
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+      res.json(tweets);
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 
 module.exports = adminController;
