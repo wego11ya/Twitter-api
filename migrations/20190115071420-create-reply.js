@@ -13,6 +13,13 @@ module.exports = {
       },
       TweetId: {
         type: Sequelize.INTEGER,
+        // - 設定 DB 中 FK 關聯
+        references: {
+          model: "Tweets",
+          key: "id",
+        },
+        // - 當 Tweet 刪除時，也一並刪除 DB 中關聯的 Reply
+        onDelete: "CASCADE",
       },
       comment: {
         type: Sequelize.TEXT,

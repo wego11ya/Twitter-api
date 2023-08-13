@@ -106,6 +106,17 @@ const adminController = {
       next(error);
     }
   },
+  deleteTweet: async (req, res, next) => {
+    try {
+      const id = req.params.id;
+      const deletedTweet = await Tweet.destroy({
+        where: { id },
+      });
+      res.json({ deleted: deletedTweet > 0 });
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 
 module.exports = adminController;
