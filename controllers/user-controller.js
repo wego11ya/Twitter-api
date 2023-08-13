@@ -351,6 +351,7 @@ const userController = {
       next(error);
     }
   },
+  putUser: async (req, res, next) => {},
 };
 
 module.exports = userController;
