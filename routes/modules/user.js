@@ -10,6 +10,13 @@ router.get("/:id/likes", userController.getUserLikes);
 router.get("/:id/followings", userController.getUserFollowings);
 router.get("/:id/followers", userController.getUserFollowers);
 router.get("/:id", userController.getUserInfo);
-router.put("/:id", upload.single("image"), userController.putUser);
+router.put(
+  "/:id",
+  upload.fields([
+    { name: "avatar", maxCount: 1 },
+    { name: "cover", maxCount: 1 },
+  ]),
+  userController.putUser
+);
 
 module.exports = router;

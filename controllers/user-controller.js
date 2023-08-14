@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { getUser } = require("../helpers/auth-helper");
 const { newError } = require("../helpers/error-helper");
+const { imgurFileHandler } = require("../helpers/file-helper");
 const {
   User,
   Tweet,
@@ -351,7 +352,34 @@ const userController = {
       next(error);
     }
   },
-  putUser: async (req, res, next) => {},
+  putUser: async (req, res, next) => {
+    try {
+      const { name, introduction } = req.body;
+      const paramsId = Number(req.params.id);
+      if (paramsId !== getUser(req).id)
+        throw newError(403, "無法修改他人資料!");
+      if (name?.length > 50) throw newError(400, "暱稱 name 上限 50 字!");
+      if (introduction?.length > 160)
+        throw newError(400, "自我介紹 introduction 上限 160 字!");
+      const { files } = req;
+      const [user, avatarFilePath, coverFilePath] = await Promise.all([
+        User.findByPk(paramsId),
+        imgurFileHandler(files?.avatar ? files.avatar[0] : null),
+        imgurFileHandler(files?.cover ? files.cover[0] : null),
+      ]);
+      const updatedUser = await user.update({
+        name,
+        introduction,
+        avatar: avatarFilePath || user.avatar,
+        cover: coverFilePath || user.cover,
+      });
+      const updatedUserData = updatedUser.toJSON();
+      delete updatedUserData.password;
+      res.json(updatedUserData);
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 
 module.exports = userController;
