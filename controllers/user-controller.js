@@ -380,6 +380,61 @@ const userController = {
       next(error);
     }
   },
+  putUserSetting: async (req, res, next) => {
+    try {
+      const paramsId = Number(req.params.id);
+      const currentUser = getUser(req);
+      const { name, account, email, password, checkPassword } = req.body;
+      if (paramsId !== currentUser.id) throw newError(403, "無法修改他人資料!");
+      if (
+        !name?.trim() ||
+        !account?.trim() ||
+        !email?.trim() ||
+        !password?.trim() ||
+        !checkPassword?.trim()
+      )
+        throw newError(400, "所有欄位都是必填");
+      if (password !== checkPassword)
+        throw newError(400, "密碼與確認密碼不相符");
+      if (name.length > 50) throw newError(400, "暱稱 name 上限 50 字!");
+      const [user, userByEmail, userByAccount] = await Promise.all([
+        User.findByPk(paramsId),
+        User.findOne({ where: { email } }),
+        User.findOne({ where: { account } }),
+      ]);
+      if (userByEmail && userByEmail.id !== currentUser.id)
+        throw newError(400, "email 已被註冊");
+      if (userByAccount && userByAccount.id !== currentUser.id)
+        throw newError(400, "account 已被註冊");
+      const updatedUser = await user.update({
+        name,
+        account,
+        email,
+        password: bcrypt.hashSync(password, 10),
+      });
+      const updatedUserData = updatedUser.toJSON();
+      delete updatedUserData.password;
+      res.json(updatedUserData);
+    } catch (error) {
+      next(error);
+    }
+  },
+  patchUserCover: async (req, res, next) => {
+    try {
+      const paramsId = Number(req.params.id);
+      const currentUser = getUser(req);
+      if (paramsId !== currentUser.id) throw newError(403, "無法修改他人資料!");
+      const user = await User.findByPk(paramsId);
+      // update the cover to a default "No Image" placeholder
+      const userCover = await user.update({
+        cover:
+          "https://st3.depositphotos.com/23594922/31822/v/600/depositphotos_318221368-stock-illustration-missing-picture-page-for-website.jpg",
+      });
+      return res.json(userCover);
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 
 module.exports = userController;

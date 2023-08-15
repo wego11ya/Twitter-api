@@ -39,7 +39,6 @@ const adminController = {
       使用者清單預設按推文數排序，由多至少
       */
       const users = await User.findAll({
-        where: { role: "user" },
         attributes: {
           exclude: ["password"],
           include: [
