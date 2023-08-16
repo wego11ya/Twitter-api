@@ -110,37 +110,49 @@ const userController = {
   getUserTweets: async (req, res, next) => {
     try {
       // retreive likeCounts, replyCounts, isLiked
-      const theUserId = req.params.id;
+      const theUserId = Number(req.params.id);
       const currentUserId = getUser(req).id;
       const theUser = await User.findByPk(theUserId);
       if (!theUser || theUser.role !== "user")
         throw newError(404, "使用者不存在");
-      const tweets = await Tweet.findAll({
+      const theUserTweets = await Tweet.findAll({
         where: { UserId: theUserId },
-        include: [
-          { model: Like, attributes: ["id", "UserId"] },
-          { model: Reply, attributes: ["id"] },
+        attributes: [
+          "id",
+          "UserId",
+          "description",
+          "createdAt",
+          "updatedAt",
+          [
+            sequelize.literal(
+              `(SELECT COUNT(id) FROM Likes WHERE TweetId = Tweet.id)`
+            ),
+            "likeCounts",
+          ],
+          [
+            sequelize.literal(
+              `(SELECT COUNT(id) FROM Replies WHERE TweetId = Tweet.id)`
+            ),
+            "replyCounts",
+          ],
+          [
+            sequelize.literal(
+              `(SELECT EXISTS(SELECT(id) FROM Likes WHERE TweetId = Tweet.id AND UserId = ${currentUserId}))`
+            ),
+            "isLiked",
+          ],
         ],
         order: [["createdAt", "DESC"]],
       });
-      if (tweets.length === 0) throw newError(404, "使用者沒有推文");
-      const tweetsInfo = tweets.map((tweet) => {
-        let tweetJSON = tweet.toJSON();
-        const isLiked = tweetJSON.Likes.some(
-          (like) => like.UserId === currentUserId
-        );
+      if (!theUserTweets.length) throw newError(404, "使用者沒有推文");
+      const theUserTweetsInfo = theUserTweets.map((tweet) => {
+        const tweetJSON = tweet.toJSON();
         return {
-          id: tweet.id,
-          UserId: tweet.UserId,
-          description: tweet.description,
-          createdAt: tweet.createdAt,
-          likeCounts: tweet.Likes.length,
-          replyCounts: tweet.Replies.length,
-          isLiked,
+          ...tweetJSON,
+          isLiked: tweetJSON.isLiked === 1,
         };
       });
-
-      return res.json(tweetsInfo);
+      res.json(theUserTweetsInfo);
     } catch (error) {
       next(error);
     }
