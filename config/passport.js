@@ -2,6 +2,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const passportJWT = require("passport-jwt");
 const bcrypt = require("bcryptjs");
+const { newError } = require("../helpers/error-helper");
 const { User } = require("../models");
 
 const JWTStrategy = passportJWT.Strategy;
@@ -18,9 +19,9 @@ passport.use(
     async (account, password, cb) => {
       try {
         const user = await User.findOne({ where: { account } });
-        if (!user) throw new Error("帳號或密碼輸入錯誤!");
+        if (!user) throw newError(400, "帳號或密碼輸入錯誤!");
         const passwordCompare = await bcrypt.compare(password, user.password);
-        if (!passwordCompare) throw new Error("帳號或密碼輸入錯誤!");
+        if (!passwordCompare) throw newError(400, "帳號或密碼輸入錯誤!");
         return cb(null, user);
       } catch (err) {
         cb(err, false);

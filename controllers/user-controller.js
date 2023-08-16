@@ -24,7 +24,7 @@ const userController = {
       res.json({
         status: "success",
         token,
-        user: userData,
+        ...userData,
       });
     } catch (error) {
       next(error);
