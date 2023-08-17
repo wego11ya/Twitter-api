@@ -5,7 +5,7 @@ const upload = require("../../middleware/multer");
 router.get("/current_user", userController.getCurrentUser);
 router.get("/top_followed", userController.getTopFollowedUsers);
 router.get("/:id/tweets", userController.getUserTweets);
-router.get("/:id/replied_tweeets", userController.getUserReplies);
+router.get("/:id/replied_tweets", userController.getUserReplies);
 router.get("/:id/likes", userController.getUserLikes);
 router.get("/:id/followings", userController.getUserFollowings);
 router.get("/:id/followers", userController.getUserFollowers);
