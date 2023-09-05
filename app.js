@@ -8,11 +8,13 @@ const routes = require("./routes");
 
 const app = express();
 const port = process.env.PORT || 3000;
-
+const handlebars = require("express-handlebars");
 // use helpers.getUser(req) to replace req.user
 function authenticated(req, res, next) {
   // passport.authenticate('jwt', { ses...
 }
+app.engine("hbs", handlebars({ defaultLayout: "main", extname: ".hbs" }));
+app.set("view engine", "hbs");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(passport.initialize());
