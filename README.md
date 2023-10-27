@@ -1,12 +1,23 @@
-# Simple Twitter API
+# Twitter API
 
-This project, Simple Twitter, has been developed using a front-end and back-end separation model. This repository is for the back-end and contains information about the API provided by the back-end.
+This repository is part of the Simple Twitter project, which has been developed using a front-end and back-end separation model. The focus here is on the back-end API.
 
-# [API Documents](https://www.notion.so/API-469a52bfc4f94f9ab300132e4b324166#f002277fef914b7180927fbe8b5e44f7)
+### Why This Project?
+
+This project aims to provide a simplified yet robust Twitter-like social networking service. It demonstrates how to build scalable and maintainable APIs using Node.js, MySQL, and Sequelize.
+
+# AWS Deployment [🚀 Try it on AWS!](http://twitter-api-awseb-dev.ap-northeast-1.elasticbeanstalk.com/)
+
+This project is deployed on AWS to demonstrate my capability in utilizing AWS services, specifically AWS Elastic Beanstalk for application hosting and AWS RDS for database management.
+You can [try the deployed version here](http://twitter-api-awseb-dev.ap-northeast-1.elasticbeanstalk.com/). You may also follow this [API document](https://wei-lin-vision.notion.site/Twitter-API-bbe054fbca0148d59814db94e728d23d) for more details on how to interact with the API using Postman.
+
+# API Documentation
+
+https://wei-lin-vision.notion.site/Twitter-API-bbe054fbca0148d59814db94e728d23d
 
 # Product Features
 
-### Administator
+### Administrator
 
 - View all tweets from users
 - Delete any tweet
@@ -23,7 +34,7 @@ This project, Simple Twitter, has been developed using a front-end and back-end 
 - View all tweets, replies, liked tweets, as well as the follower and following lists of the user on personal page
 - View the top ten recommended users to follow
 
-# Install
+# Install Locally
 
 1. Install Node.js, npm, nodemon, MySQL
 2. Clone this project to your local repository
@@ -72,4 +83,4 @@ password: 12345678
 
 # Developer
 
-### [Wei](https://github.com/wego11ya)
+### [Wei Lin](https://github.com/wego11ya)
