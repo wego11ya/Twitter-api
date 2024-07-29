@@ -1,19 +1,18 @@
-# Twitter API
+# Twitter API Introduction
 
-This repository is part of the Simple Twitter project, which has been developed using a front-end and back-end separation model. The focus here is on the back-end API.
-
-### Why This Project?
-
-This project aims to provide a simplified yet robust Twitter-like social networking service. It demonstrates how to build scalable and maintainable APIs using Node.js, MySQL, and Sequelize.
-
-# AWS Deployment [🚀 Try it on AWS!](http://twitter-api-awseb-dev.ap-northeast-1.elasticbeanstalk.com/)
-
-This project is deployed on AWS to demonstrate my capability in utilizing AWS services, specifically AWS Elastic Beanstalk for application hosting and AWS RDS for database management.
-You can [try the deployed version here](http://twitter-api-awseb-dev.ap-northeast-1.elasticbeanstalk.com/). You may also follow this [API document](https://wei-lin-vision.notion.site/Twitter-API-bbe054fbca0148d59814db94e728d23d) for more details on how to interact with the API using Postman.
+This repository contains the backend API for a Twitter-like project, demonstrating a simple implementation of Twitter's core features. The project is developed with a separation of frontend and backend, where this repository focuses solely on the backend API functionalities.
 
 # API Documentation
 
 https://wei-lin-vision.notion.site/Twitter-API-bbe054fbca0148d59814db94e728d23d
+
+# Entity Relationship Diagram (ERD)
+
+![Twitter_ERD](/public/Twitter-ERD.png)
+
+# System Architecture
+
+![System Architecture](/public/Twitter-API-System-Architecture.png)
 
 # Product Features
 
@@ -27,11 +26,15 @@ https://wei-lin-vision.notion.site/Twitter-API-bbe054fbca0148d59814db94e728d23d
 
 - Register a new account and login to the website
 - Post tweets and view all tweets
+  ![Tweet Demo](/public/tweet-demo.gif)
 - Reply to other tweets
-- Like / unlike other tweets
-- Follow / unfollow other Users
+  ![Reply](/public/reply-demo.gif)
+- Like / unlike other tweets, Follow / unfollow other Users
+  ![Like and Follow](/public/like-unlike-follow-unfollow.gif)
 - Edit personal information including account, name, email, password, self-introduction, avatar etc.
+  ![Edit](/public/edit-user-info-demo.gif)
 - View all tweets, replies, liked tweets, as well as the follower and following lists of the user on personal page
+  ![Personal](/public/personal-page.gif)
 - View the top ten recommended users to follow
 
 # Install Locally
