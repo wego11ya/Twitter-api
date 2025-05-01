@@ -8,11 +8,11 @@ https://wei-lin-vision.notion.site/Twitter-API-bbe054fbca0148d59814db94e728d23d
 
 # Entity Relationship Diagram (ERD)
 
-![Twitter_ERD](/public/Twitter-ERD.png)
+![Twitter_ERD](public/Twitter-ERD.png)
 
 # System Architecture
 
-![System Architecture](/public/Twitter-API-System-Architecture.png)
+![System Architecture](public/Twitter-API-System-Architecture.png)
 
 # Product Features
 
